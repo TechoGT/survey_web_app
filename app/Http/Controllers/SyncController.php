@@ -67,10 +67,10 @@ class SyncController extends Controller {
             $idG = $group['id']['gid'];
 
             //Informacion de grupo
-            $groupInfo = $this->getGroupProperties($idG);
+            $groupInfo = $this->getGroupProperties($sessionKey,$idG);
 
             // Preguntas de section
-            $qOfGroup = $this->getQuestionsOfgroup($id, $idG);
+            $qOfGroup = $this->getQuestionsOfgroup($sessionKey,$id, $idG);
 
             $groupInfo ['questions']= $qOfGroup;
 
@@ -78,15 +78,12 @@ class SyncController extends Controller {
 
         }
 
-        $suInfo = $this->getSurveyProperties($id);
+        $suInfo = $this->getSurveyProperties($sessionKey,$id);
         $suInfo['sections'] = $sections;
         return $suInfo;
 	}
 
-    private function getQuestionsOfgroup($surveyId,$groupId){
-
-        //token usuario
-        $sessionKey =  $this->authUser();
+    private function getQuestionsOfgroup($sessionKey,$surveyId,$groupId){
 
         $JSONRPCClient = new \org\jsonrpcphp\JsonRPCClient( LS_BASEURL.'/admin/remotecontrol' );
 
@@ -96,15 +93,13 @@ class SyncController extends Controller {
         $qWithProps = null;
         foreach($questionsList as $question){
             $qId = $question['id']['qid'];
-            $qWithProps [] = $this->getQuestionProperty($qId);
+            $qWithProps [] = $this->getQuestionProperty($sessionKey,$qId);
         }
 
         return $qWithProps;
     }
 
-    private function getGroupProperties($gId){
-        //token usuario
-        $sessionKey =  $this->authUser();
+    private function getGroupProperties($sessionKey, $gId){
 
         $JSONRPCClient = new \org\jsonrpcphp\JsonRPCClient( LS_BASEURL.'/admin/remotecontrol' );
 
@@ -117,9 +112,7 @@ class SyncController extends Controller {
         return $groupInfo;
     }
 
-    private function getQuestionProperty($id){
-        //token usuario
-        $sessionKey =  $this->authUser();
+    private function getQuestionProperty($sessionKey, $id){
 
         $JSONRPCClient = new \org\jsonrpcphp\JsonRPCClient( LS_BASEURL.'/admin/remotecontrol' );
 
@@ -135,8 +128,7 @@ class SyncController extends Controller {
         return $qList;
     }
 
-    private function getSurveyProperties($idsu){
-        $sessionKey =  $this->authUser();
+    private function getSurveyProperties($sessionKey, $idsu){
 
         $JSONRPCClient = new \org\jsonrpcphp\JsonRPCClient( LS_BASEURL.'/admin/remotecontrol' );
 

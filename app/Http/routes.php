@@ -26,6 +26,10 @@ Route::group(array('prefix' => 'api/v1'), function()
 
 });
 
+Route::get('vinicio', function(){
+    return 'hola';
+});
+
 
 Route::controllers([
 	'auth' => 'Auth\AuthController',
