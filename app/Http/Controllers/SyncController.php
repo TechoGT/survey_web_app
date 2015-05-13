@@ -92,10 +92,16 @@ class SyncController extends Controller {
 
         $qWithProps = null;
         foreach($questionsList as $question){
-            $qId = $question['id']['qid'];
-            $qWithProps [] = $this->getQuestionProperty($sessionKey,$qId);
-        }
 
+            $qId = $question['id']['qid'];
+
+            //Question with property
+            $qWithProperty = $this->getQuestionProperty($sessionKey,$qId);
+            //Quitar preguntas que son subpreguntas
+            if($qWithProperty['parent_qid'] == 0 ){
+                $qWithProps [] = $this->getQuestionProperty($sessionKey,$qId);
+            }
+        }
         return $qWithProps;
     }
 
