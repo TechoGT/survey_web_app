@@ -5,6 +5,9 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 
+use \org\jsonrpcphp\JsonRPCClient;
+
+
 class SyncController extends Controller {
 
 
@@ -46,31 +49,38 @@ class SyncController extends Controller {
 	 */
 	public function show($id)
 	{
-        // LimeSurvey Core URL
-        // LimeSurvey Core URL
-        define( 'LS_BASEURL', '192.168.10.1/limesurvey/index.php');
-        define( 'LS_USER', 'admin' );
-        define( 'LS_PASSWORD', 'qwerty' );
+        // Global variables tu access Limesurvey core
 
-        //token usuario
-        $sessionKey =  $this->authUser();
+        //URL of the Limesurvey RemoteControll based in JSON-RPC
+        define( 'LS_BASEURL', $_ENV['LS_BASEURL']);
+        //Administrator User in Limesurvey
+        define( 'LS_USER', $_ENV['LS_USER'] );
+        //Administrator User passwrod in Limesurvey
+        define( 'LS_PASSWORD', $_ENV['LS_PASSWORD'] );
 
-        $JSONRPCClient = new \org\jsonrpcphp\JsonRPCClient( LS_BASEURL.'/admin/remotecontrol' );
+        //Start a JSON RPC Client for the requests
+        $RPCClient = new JsonRPCClient( LS_BASEURL.'/admin/remotecontrol' );
 
-        $groups = $JSONRPCClient->list_groups($sessionKey,$id);
+        //User private Token
+        $sessionKey =  $this->authUser($RPCClient);
 
-        //secciones
+        //Get all the Sections or Groups of questions using unique
+        //Survey id from the Limesurvey core service
+        $groups = $RPCClient->list_groups($sessionKey,$id);
+
+        //Empty Sections array
         $sections = array();
 
-        //listado de grupos
+        //Configure each group/section of questions to return a correct JSON
         foreach($groups as $group){
+            //Get the group/section id
             $idG = $group['id']['gid'];
 
-            //Informacion de grupo
-            $groupInfo = $this->getGroupProperties($sessionKey,$idG);
+            //Get all the information of a given group/section
+            $groupInfo = $this->getGroupProperties($RPCClient,$sessionKey,$idG);
 
-            // Preguntas de section
-            $qOfGroup = $this->getQuestionsOfgroup($sessionKey,$id, $idG);
+            // Get all questions of a given Group, it is a list.
+            $qOfGroup = $this->getQuestionsOfgroup($RPCClient,$sessionKey,$id, $idG);
 
             $groupInfo ['questions']= $qOfGroup;
 
@@ -78,67 +88,21 @@ class SyncController extends Controller {
 
         }
 
-        $suInfo = $this->getSurveyProperties($sessionKey,$id);
+        $suInfo = $this->getSurveyProperties($RPCClient,$sessionKey,$id);
         $suInfo['sections'] = $sections;
         return $suInfo;
 	}
 
-    private function getQuestionsOfgroup($sessionKey,$surveyId,$groupId){
 
-        $JSONRPCClient = new \org\jsonrpcphp\JsonRPCClient( LS_BASEURL.'/admin/remotecontrol' );
+    /** Get the properties of a given survey
+     * @param $RPCClient
+     * @param $sessionKey
+     * @param $idSu
+     * @return array
+     */
+    private function getSurveyProperties($RPCClient,$sessionKey, $idSu){
 
-
-        $questionsList = $JSONRPCClient->list_questions($sessionKey,$surveyId,$groupId);
-
-        $qWithProps = null;
-        foreach($questionsList as $question){
-
-            $qId = $question['id']['qid'];
-
-            //Question with property
-            $qWithProperty = $this->getQuestionProperty($sessionKey,$qId);
-            //Quitar preguntas que son subpreguntas
-            if($qWithProperty['parent_qid'] == 0 ){
-                $qWithProps [] = $this->getQuestionProperty($sessionKey,$qId);
-            }
-        }
-        return $qWithProps;
-    }
-
-    private function getGroupProperties($sessionKey, $gId){
-
-        $JSONRPCClient = new \org\jsonrpcphp\JsonRPCClient( LS_BASEURL.'/admin/remotecontrol' );
-
-
-        $groupInfo = $JSONRPCClient->get_group_properties($sessionKey,$gId,array(
-            'gid','group_order','description','sid','group_name',
-
-        ));
-
-        return $groupInfo;
-    }
-
-    private function getQuestionProperty($sessionKey, $id){
-
-        $JSONRPCClient = new \org\jsonrpcphp\JsonRPCClient( LS_BASEURL.'/admin/remotecontrol' );
-
-
-        $qList = $JSONRPCClient->get_question_properties($sessionKey,$id, array(
-            'type',	'help', 'parent_qid','title','other','scale_id',
-            'sid',	'question',	'mandatory'	,'same_default',
-            'gid',	'preg',	'question_order',	'relevance',
-            'subquestions',	'attributes',	'attributes_lang',	'answeroptions'
-        ));
-        $qList['id'] = $id;
-        $qList['question'] = strip_tags($qList['question']);
-        return $qList;
-    }
-
-    private function getSurveyProperties($sessionKey, $idsu){
-
-        $JSONRPCClient = new \org\jsonrpcphp\JsonRPCClient( LS_BASEURL.'/admin/remotecontrol' );
-
-        $surveyProp = $JSONRPCClient->get_survey_properties($sessionKey,$idsu,array(
+        $surveyProp = $RPCClient->get_survey_properties($sessionKey,$idSu,array(
             'sid','active',	'autonumber_start',	'owner_id','admin','expires',
             'adminemail','startdate','format','template',
             'tokenlength','anonymized','usetokens',
@@ -147,10 +111,73 @@ class SyncController extends Controller {
         return $surveyProp;
     }
 
-    private function authUser(){
+    /** Get the properties of a given question
+     * @param $sessionKey
+     * @param $id
+     * @return mixed
+     */
+    private function getQuestionProperty($RPCClient, $sessionKey, $id){
 
-        // instanciate a new client
-        $JSONRPCClient = new \org\jsonrpcphp\JsonRPCClient( LS_BASEURL.'/admin/remotecontrol' );
+        $qList = $RPCClient->get_question_properties($sessionKey,$id, array(
+            'type',	'help', 'parent_qid','title','other','scale_id',
+            'sid',	'question',	'mandatory'	,'same_default',
+            'gid',	'preg',	'question_order',	'relevance',
+            'subquestions',	'attributes','attributes_lang','answeroptions'
+        ));
+        $qList['id'] = $id;
+        $qList['question'] = strip_tags($qList['question']);
+        return $qList;
+    }
+
+    /** Get a list of questions of a given group/section. It contains properties
+     * of every question
+     * @param $RPCClient
+     * @param $sessionKey
+     * @param $surveyId
+     * @param $groupId
+     * @return array|null
+     */
+    private function getQuestionsOfgroup($RPCClient,$sessionKey,$surveyId,$groupId){
+
+        $questionsList = $RPCClient->list_questions($sessionKey,$surveyId,$groupId);
+
+        $qWithProps = null;
+        foreach($questionsList as $question){
+
+            $qId = $question['id']['qid'];
+
+            //Question with property
+            $qWithProperty = $this->getQuestionProperty($RPCClient,$sessionKey,$qId);
+            //Quitar preguntas que son subpreguntas
+            if($qWithProperty['parent_qid'] == 0 ){
+                $qWithProps [] = $this->getQuestionProperty($RPCClient,$sessionKey,$qId);
+            }
+        }
+        return $qWithProps;
+    }
+
+    /** Get all the information of a given Group/Section of
+     *  Questions.
+     * @param $RPCClient
+     * @param $sessionKey
+     * @param $gId
+     * @return mixed
+     */
+    private function getGroupProperties($RPCClient,$sessionKey, $gId){
+
+        $groupInfo = $RPCClient->get_group_properties($sessionKey,$gId,array(
+            'gid','group_order','description','sid','group_name',
+
+        ));
+
+        return $groupInfo;
+    }
+
+    /** For every request, a token is necessary
+     * @param $JSONRPCClient
+     * @return User private token
+     */
+    private function authUser($JSONRPCClient){
 
         // receive session key
         $sessionKey= $JSONRPCClient->get_session_key( LS_USER, LS_PASSWORD );
