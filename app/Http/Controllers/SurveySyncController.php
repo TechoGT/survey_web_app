@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use \org\jsonrpcphp\JsonRPCClient;
 
 
-class SyncController extends Controller {
+class SurveySyncController extends Controller {
 
 
 	/**
@@ -90,6 +90,9 @@ class SyncController extends Controller {
 
         $suInfo = $this->getSurveyProperties($RPCClient,$sessionKey,$id);
         $suInfo['sections'] = $sections;
+
+        // release the session key
+        $RPCClient->release_session_key($sessionKey);
         return $suInfo;
 	}
 

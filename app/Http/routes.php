@@ -20,16 +20,11 @@ Route::group(array('prefix' => 'api/v1'), function()
 {
 
     // First Route
-    Route::resource('/sync', 'SyncController');
+    Route::resource('/sync/survey', 'SurveySyncController');
     // List groups
-    Route::resource('/questions/list', 'GroupOfQuestions\GroupOfQuestionsController');
+    Route::resource('/sync/response', 'ResponseSyncController');
 
 });
-
-Route::get('vinicio', function(){
-    return 'hola';
-});
-
 
 Route::controllers([
 	'auth' => 'Auth\AuthController',

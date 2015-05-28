@@ -45,23 +45,7 @@ class GroupOfQuestionsController extends Controller {
 	 */
 	public function show($id)
 	{
-        define( 'LS_BASEURL', 'http://192.168.10.1/limesurvey/index.php');  // adjust this one to your actual LimeSurvey URL
-        define( 'LS_USER', 'admin' );
-        define( 'LS_PASSWORD', 'qwerty' );
 
-        //$client =  new Client(LS_BASEURL);
-        // the survey to process
-        $survey_id=177998;
-
-        // instanciate a new client
-        $myJSONRPCClient = new \org\jsonrpcphp\JsonRPCClient( LS_BASEURL.'/admin/remotecontrol' );
-
-        // receive session key
-        $sessionKey= $myJSONRPCClient->get_session_key( LS_USER, LS_PASSWORD );
-
-        $questionInfo = $myJSONRPCClient->list_groups($sessionKey,$id);
-
-        return $questionInfo;
 	}
 
 	/**
