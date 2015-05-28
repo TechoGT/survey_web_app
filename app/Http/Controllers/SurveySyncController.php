@@ -59,7 +59,7 @@ class SurveySyncController extends Controller {
         define( 'LS_PASSWORD', $_ENV['LS_PASSWORD'] );
 
         //Start a JSON RPC Client for the requests
-        $RPCClient = new JsonRPCClient( LS_BASEURL.'/admin/remotecontrol' );
+        $RPCClient = new JsonRPCClient( LS_BASEURL.'admin/remotecontrol' );
 
         //User private Token
         $sessionKey =  $this->authUser($RPCClient);

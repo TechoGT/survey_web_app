@@ -46,7 +46,7 @@ class ResponseSyncController extends Controller {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function show($id)
+	public function show($id,$params)
 	{
         // Global variables tu access Limesurvey core
 
@@ -58,20 +58,23 @@ class ResponseSyncController extends Controller {
         define( 'LS_PASSWORD', $_ENV['LS_PASSWORD'] );
 
         //Start a JSON RPC Client for the requests
-        $RPCClient = new JsonRPCClient( LS_BASEURL.'/admin/remotecontrol' );
+        $RPCClient = new JsonRPCClient( LS_BASEURL.'admin/remotecontrol' );
 
         //User private Token
         $sessionKey =  $this->authUser($RPCClient);
 
-        $response = $this->addResponse($RPCClient,$sessionKey,$id);
+        $response = $this->addResponse($RPCClient,$sessionKey,$id,$params);
         return $response;
 	}
 
-    private function addResponse($RPCClient, $sessionKey, $suId){
+    private function addResponse($RPCClient, $sessionKey, $suId,$data){
 
-        $data = $_REQUEST['POST'];
-
-        return $RPCClient->add_response($sessionKey,$suId,$data);
+        //$temp = $_REQUEST['POST'];
+        /*$data = array(
+            "949485X13X177"=>"!claro!!"
+        );*/
+        $send = $data['answers'];
+        return $RPCClient->add_response($sessionKey,$suId,$send);
 
     }
 
