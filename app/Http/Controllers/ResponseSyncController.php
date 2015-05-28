@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 use \org\jsonrpcphp\JsonRPCClient;
 
-
+use Input;
 class ResponseSyncController extends Controller {
 
 	/**
@@ -35,19 +35,9 @@ class ResponseSyncController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function store()
+	public function store($id)
 	{
-		//
-	}
 
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function show($id,$params)
-	{
         // Global variables tu access Limesurvey core
 
         //URL of the Limesurvey RemoteControll based in JSON-RPC
@@ -63,18 +53,32 @@ class ResponseSyncController extends Controller {
         //User private Token
         $sessionKey =  $this->authUser($RPCClient);
 
-        $response = $this->addResponse($RPCClient,$sessionKey,$id,$params);
+
+        $response = $this->addResponse($RPCClient,$sessionKey,$id);
         return $response;
+
 	}
 
-    private function addResponse($RPCClient, $sessionKey, $suId,$data){
+	/**
+	 * Display the specified resource.
+	 *
+	 * @param  int  $id
+	 * @return Response
+	 */
+	public function show($id)
+	{
+	}
+
+    private function addResponse($RPCClient, $sessionKey, $suId){
 
         //$temp = $_REQUEST['POST'];
         /*$data = array(
             "949485X13X177"=>"!claro!!"
         );*/
-        $send = $data['answers'];
-        return $RPCClient->add_response($sessionKey,$suId,$send);
+
+        $data = Input::json()->all();
+
+        return $RPCClient->add_response($sessionKey,$suId,$data);
 
     }
 

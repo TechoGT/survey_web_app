@@ -22,7 +22,7 @@ Route::group(array('prefix' => 'api/v1'), function()
     // First Route
     Route::resource('/sync/survey', 'SurveySyncController');
     // List groups
-    Route::resource('/sync/response/{id}/{params}', 'ResponseSyncController');
+    Route::resource('/sync/response}', 'ResponseSyncController');
 
 });
 
