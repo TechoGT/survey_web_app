@@ -35,7 +35,7 @@ class ResponseSyncController extends Controller {
 	 *
 	 * @return Response
 	 */
-	public function store($id)
+	public function store()
 	{
 
         // Global variables tu access Limesurvey core
@@ -54,7 +54,10 @@ class ResponseSyncController extends Controller {
         $sessionKey =  $this->authUser($RPCClient);
 
 
-        $response = $this->addResponse($RPCClient,$sessionKey,$id);
+
+        $data = Input::json()->all();
+        return $data;
+        $response = $this->addResponse($RPCClient,$sessionKey,$data);
         return $response;
 
 	}
@@ -69,16 +72,12 @@ class ResponseSyncController extends Controller {
 	{
 	}
 
-    private function addResponse($RPCClient, $sessionKey, $suId){
+    private function addResponse($RPCClient, $sessionKey, $data){
 
-        //$temp = $_REQUEST['POST'];
-        /*$data = array(
-            "949485X13X177"=>"!claro!!"
-        );*/
 
-        $data = Input::json()->all();
+        //$arrayData = $data
 
-        return $RPCClient->add_response($sessionKey,$suId,$data);
+        //return $RPCClient->add_response($sessionKey,$suId,$data);
 
     }
 
