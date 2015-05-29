@@ -55,9 +55,12 @@ class ResponseSyncController extends Controller {
 
 
 
-        $data = Input::json()->all();
-        return $data;
-        $response = $this->addResponse($RPCClient,$sessionKey,$data);
+        $postData = Input::json()->all();
+        $surveryId = $postData['sid'];
+        $surveyAnswers = $postData['answers'];
+
+        $response = $RPCClient->add_response($sessionKey,$surveryId,$surveyAnswers);
+
         return $response;
 
 	}
