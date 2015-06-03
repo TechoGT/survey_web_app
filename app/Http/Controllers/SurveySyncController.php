@@ -107,11 +107,19 @@ class SurveySyncController extends Controller {
 
         $surveyProp = $RPCClient->get_survey_properties($sessionKey,$idSu,array(
             'sid','active',	'autonumber_start',	'owner_id','admin','expires',
-            'adminemail','startdate','format','template',
-            'tokenlength','anonymized','usetokens',
-            'datecreated','showprogress','datestamp','navigationdelay','showqnumcode'
+            'adminemail','startdate','format',
+            'tokenlength','usetokens',
+            'datecreated','showprogress','datestamp'
         ));
-        return $surveyProp;
+
+        // Adding extra data to the Survey using get_language_properties
+        $moreSurveyProp = $RPCClient->get_language_properties($sessionKey,$idSu,array(
+            'surveyls_title','surveyls_description','surveyls_welcometext',
+            'surveyls_endtext'
+        ),'es');
+        // Insert extra data to array
+        $united = array_merge($moreSurveyProp,$surveyProp);
+        return $united;
     }
 
     /** Get the properties of a given question
@@ -129,6 +137,16 @@ class SurveySyncController extends Controller {
         ));
         $qList['id'] = $id;
         $qList['question'] = strip_tags($qList['question']);
+
+        //Add of "checked" to any subquestion for ease of render in app
+        // Only if the array has subquestions
+        if(count($qList['subquestions']) > 1){
+            $subQuestions = $qList['subquestions'];
+            foreach($subQuestions as $subQuestion){
+                $subQuestion['checked'] = false;
+            }
+            $qList['subquestions'] = $subQuestion;
+        }
         return $qList;
     }
 
