@@ -141,11 +141,12 @@ class SurveySyncController extends Controller {
         //Add of "checked" to any subquestion for ease of render in app
         // Only if the array has subquestions
         if(count($qList['subquestions']) > 1){
-            $subQuestions = $qList['subquestions'];
-            foreach($subQuestions as $subQuestion){
+            $subQuestions = array();
+            foreach($qList['subquestions'] as $subQuestion){
                 $subQuestion['checked'] = false;
+                $subQuestions[] = $subQuestion;
             }
-            $qList['subquestions'] = $subQuestion;
+            $qList['subquestions'] = $subQuestions;
         }
         return $qList;
     }
