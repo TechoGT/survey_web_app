@@ -36,35 +36,32 @@ class ResponseSyncController extends Controller {
 	 * @return Response
 	 */
 	public function store()
-	{
+    {
 
         // Global variables tu access Limesurvey core
 
         //URL of the Limesurvey RemoteControll based in JSON-RPC
-        define( 'LS_BASEURL', $_ENV['LS_BASEURL']);
+        define('LS_BASEURL', $_ENV['LS_BASEURL']);
         //Administrator User in Limesurvey
-        define( 'LS_USER', $_ENV['LS_USER'] );
+        define('LS_USER', $_ENV['LS_USER']);
         //Administrator User passwrod in Limesurvey
-        define( 'LS_PASSWORD', $_ENV['LS_PASSWORD'] );
+        define('LS_PASSWORD', $_ENV['LS_PASSWORD']);
 
         //Start a JSON RPC Client for the requests
-        $RPCClient = new JsonRPCClient( LS_BASEURL.'admin/remotecontrol' );
+        $RPCClient = new JsonRPCClient(LS_BASEURL . 'admin/remotecontrol');
 
         //User private Token
-        $sessionKey =  $this->authUser($RPCClient);
+        $sessionKey = $this->authUser($RPCClient);
 
-
-
+        // Gettin the json input from the user, when sync is triggered
         $postData = Input::json()->all();
-        $surveryId = $postData['sid'];
-        $surveyAnswers = $postData['answers'];
 
-        $response = $RPCClient->add_response($sessionKey,$surveryId,$surveyAnswers);
+        $responses = $postData['answers'];
+        $idSurvey = array_keys($responses)[0];
 
-        return $response;
-
-	}
-
+        // If survey is active send response
+        $this->addResponse($RPCClient,$sessionKey,$idSurvey,$responses);
+    }
 	/**
 	 * Display the specified resource.
 	 *
@@ -75,12 +72,46 @@ class ResponseSyncController extends Controller {
 	{
 	}
 
-    private function addResponse($RPCClient, $sessionKey, $data){
+    /**
+     * This function sends response to a valid and active survey
+     * @param $RPCClient
+     * @param $sessionKey
+     * @param $idSurvey
+     * @param $responses
+     * @return array
+     */
+    private function addResponse($RPCClient, $sessionKey,$idSurvey, $responses){
+        // Number of responses entered to the core
+        $coreQuantityInserted = 0;
 
+        foreach($responses as $response){
+            $coreResponse = $RPCClient->add_response($sessionKey,$idSurvey,$response);
+            if(is_numeric($coreResponse)){
+                $coreQuantityInserted++;
+            }
+            //Error in insertion
+            else{
+                $coreResponse['message'] = $coreResponse['status'];
+                $coreResponse['status'] = false;
 
-        //$arrayData = $data
+                return $coreResponse;
+            }
+        }
 
-        //return $RPCClient->add_response($sessionKey,$suId,$data);
+        return array(
+            "status" => true,
+            "quantity" => $coreQuantityInserted
+        );
+
+    }
+
+    /**
+     * Checks if the survey is active, to send response
+     * @param $RPCClient
+     * @param $sessionKey
+     * @param $suId
+     */
+    private function checkSurveyStatus($RPCClient, $sessionKey,$suId){
 
     }
 

@@ -144,8 +144,22 @@ class SurveySyncController extends Controller {
             $subQuestions = array();
             foreach($qList['subquestions'] as $subQuestion){
                 $subQuestion['checked'] = false;
+
+                //Search for a type in Question, using the ##type
+                $questionText = $subQuestion['question'];
+
+                preg_match('/(##)(.)/', $questionText, $match);
+                if($match){
+                    //Set type found. second position is the character
+                    $subQuestion['type'] = strtoupper($match[2]);
+                    //Remove specified ##type
+                    $subQuestion['question'] = preg_replace('/(##)(.)/','',$questionText);
+                }
+
+                //Add modified question to question
                 $subQuestions[] = $subQuestion;
             }
+
             $qList['subquestions'] = $subQuestions;
         }
         return $qList;
