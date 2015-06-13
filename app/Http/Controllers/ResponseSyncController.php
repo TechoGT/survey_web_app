@@ -60,7 +60,16 @@ class ResponseSyncController extends Controller {
         $idSurvey = array_keys($responses)[0];
 
         // If survey is active send response
-        $this->addResponse($RPCClient,$sessionKey,$idSurvey,$responses);
+        if($this->checkSurveyStatus($RPCClient,$sessionKey,$idSurvey)){
+            $this->addResponse($RPCClient,$sessionKey,$idSurvey,$responses);
+        }
+        else{
+            return array(
+                "status" =>false,
+                "message" => 'Survey not available'
+            );
+        }
+
     }
 	/**
 	 * Display the specified resource.
@@ -113,6 +122,14 @@ class ResponseSyncController extends Controller {
      */
     private function checkSurveyStatus($RPCClient, $sessionKey,$suId){
 
+        $surveyStatus= $RPCClient->get_survey_properties($sessionKey,$suId,array(
+            'sid','active'));
+        
+        if(array_key_exists('active',$surveyStatus) & $surveyStatus['active'] == 'Y')
+        {
+            return true;
+        }
+        return false;
     }
 
     /** For every request, a token is necessary
