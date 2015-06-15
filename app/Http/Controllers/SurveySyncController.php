@@ -1,14 +1,8 @@
 <?php namespace App\Http\Controllers;
 
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
-
-use Illuminate\Http\Request;
-
 use \org\jsonrpcphp\JsonRPCClient;
 
-
-class SurveySyncController extends Controller {
+class SurveySyncController extends SurveyHelper {
 
 
 	/**
@@ -49,14 +43,7 @@ class SurveySyncController extends Controller {
 	 */
 	public function show($id)
 	{
-        // Global variables tu access Limesurvey core
 
-        //URL of the Limesurvey RemoteControll based in JSON-RPC
-        define( 'LS_BASEURL', $_ENV['LS_BASEURL']);
-        //Administrator User in Limesurvey
-        define( 'LS_USER', $_ENV['LS_USER'] );
-        //Administrator User passwrod in Limesurvey
-        define( 'LS_PASSWORD', $_ENV['LS_PASSWORD'] );
 
         //Start a JSON RPC Client for the requests
         $RPCClient = new JsonRPCClient( LS_BASEURL.'admin/remotecontrol' );
@@ -64,6 +51,19 @@ class SurveySyncController extends Controller {
         //User private Token
         $sessionKey =  $this->authUser($RPCClient);
 
+        // If survey is active send response
+        $surveyStatus = $this->checkSurveyStatus($RPCClient,$sessionKey,$id);
+
+        if($surveyStatus['status']){
+            return $this->syncSurvey($RPCClient,$sessionKey,$id);
+        }
+        else{
+            return $surveyStatus;
+        }
+
+	}
+
+    private function syncSurvey($RPCClient,$sessionKey,$id){
         //Get all the Sections or Groups of questions using unique
         //Survey id from the Limesurvey core service
         $groups = $RPCClient->list_groups($sessionKey,$id);
@@ -94,8 +94,8 @@ class SurveySyncController extends Controller {
         // release the session key
         $RPCClient->release_session_key($sessionKey);
         return $suInfo;
-	}
 
+}
 
     /** Get the properties of a given survey
      * @param $RPCClient
@@ -213,16 +213,5 @@ class SurveySyncController extends Controller {
         return $groupInfo;
     }
 
-    /** For every request, a token is necessary
-     * @param $JSONRPCClient
-     * @return User private token
-     */
-    private function authUser($JSONRPCClient){
-
-        // receive session key
-        $sessionKey= $JSONRPCClient->get_session_key( LS_USER, LS_PASSWORD );
-
-        return $sessionKey;
-    }
 
 }

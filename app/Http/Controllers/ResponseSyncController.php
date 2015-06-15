@@ -1,14 +1,9 @@
 <?php namespace App\Http\Controllers;
 
-use App\Http\Requests;
-use App\Http\Controllers\Controller;
-
-use Illuminate\Http\Request;
 
 use \org\jsonrpcphp\JsonRPCClient;
-
 use Input;
-class ResponseSyncController extends Controller {
+class ResponseSyncController extends SurveyHelper {
 
 	/**
 	 * Display a listing of the resource.
@@ -37,16 +32,6 @@ class ResponseSyncController extends Controller {
 	 */
 	public function store()
     {
-
-        // Global variables tu access Limesurvey core
-
-        //URL of the Limesurvey RemoteControll based in JSON-RPC
-        define('LS_BASEURL', $_ENV['LS_BASEURL']);
-        //Administrator User in Limesurvey
-        define('LS_USER', $_ENV['LS_USER']);
-        //Administrator User passwrod in Limesurvey
-        define('LS_PASSWORD', $_ENV['LS_PASSWORD']);
-
         //Start a JSON RPC Client for the requests
         $RPCClient = new JsonRPCClient(LS_BASEURL . 'admin/remotecontrol');
 
@@ -71,8 +56,7 @@ class ResponseSyncController extends Controller {
 
     }
 	/**
-	 * Display the specified resource.
-	 *
+	 * Display the specified resource.	 *
 	 * @param  int  $id
 	 * @return Response
 	 */
@@ -115,49 +99,6 @@ class ResponseSyncController extends Controller {
 
     }
 
-    /**
-     * Checks if the survey is active, to send response
-     * @param $RPCClient
-     * @param $sessionKey
-     * @param $suId
-     */
-    private function checkSurveyStatus($RPCClient, $sessionKey,$suId){
 
-        $surveyStatus= $RPCClient->get_survey_properties($sessionKey,$suId,array(
-            'sid','active'));
 
-        // If the survey is active, it will have an active key
-        if(array_key_exists('active',$surveyStatus)) {
-
-            switch($surveyStatus['active']){
-                case 'Y':
-                    return array(
-                        'status'=>true
-                    );
-
-                case 'N':
-                    return array(
-                        'message' => 'Survey is not Active, notify administrator',
-                        'status' => false
-                    );
-            }
-        }
-
-        return array(
-            'message' => $surveyStatus['status'],
-            'status' => false
-        );
-    }
-
-    /** For every request, a token is necessary
-     * @param $JSONRPCClient
-     * @return User private token
-     */
-    private function authUser($JSONRPCClient){
-
-        // receive session key
-        $sessionKey= $JSONRPCClient->get_session_key( LS_USER, LS_PASSWORD );
-
-        return $sessionKey;
-    }
 }
