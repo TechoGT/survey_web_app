@@ -60,14 +60,13 @@ class ResponseSyncController extends Controller {
         $idSurvey = array_keys($responses)[0];
 
         // If survey is active send response
-        if($this->checkSurveyStatus($RPCClient,$sessionKey,$idSurvey)){
+        $surveyStatus = $this->checkSurveyStatus($RPCClient,$sessionKey,$idSurvey);
+
+        if($surveyStatus['status']){
             $this->addResponse($RPCClient,$sessionKey,$idSurvey,$responses);
         }
         else{
-            return array(
-                "status" =>false,
-                "message" => 'Survey not available'
-            );
+            return $surveyStatus;
         }
 
     }
@@ -94,7 +93,9 @@ class ResponseSyncController extends Controller {
         $coreQuantityInserted = 0;
 
         foreach($responses as $response){
+            dd($response);
             $coreResponse = $RPCClient->add_response($sessionKey,$idSurvey,$response);
+
             if(is_numeric($coreResponse)){
                 $coreQuantityInserted++;
             }
@@ -124,12 +125,28 @@ class ResponseSyncController extends Controller {
 
         $surveyStatus= $RPCClient->get_survey_properties($sessionKey,$suId,array(
             'sid','active'));
-        
-        if(array_key_exists('active',$surveyStatus) & $surveyStatus['active'] == 'Y')
-        {
-            return true;
+
+        // If the survey is active, it will have an active key
+        if(array_key_exists('active',$surveyStatus)) {
+
+            switch($surveyStatus['active']){
+                case 'Y':
+                    return array(
+                        'status'=>true
+                    );
+
+                case 'N':
+                    return array(
+                        'message' => 'Survey is not Active, notify administrator',
+                        'status' => false
+                    );
+            }
         }
-        return false;
+
+        return array(
+            'message' => $surveyStatus['status'],
+            'status' => false
+        );
     }
 
     /** For every request, a token is necessary

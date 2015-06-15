@@ -145,9 +145,13 @@ class SurveySyncController extends Controller {
             foreach($qList['subquestions'] as $subQuestion){
                 $subQuestion['checked'] = false;
 
+                //Add 'answer' empty field to store answer in phone
+                if(array_key_exists('scale_id',$subQuestion) && $subQuestion['scale_id'] == 1){
+                    $subQuestion['answer'] = "";
+                }
+
                 //Search for a type in Question, using the ##type
                 $questionText = $subQuestion['question'];
-
                 preg_match('/(##)(.)/', $questionText, $match);
                 if($match){
                     //Set type found. second position is the character
