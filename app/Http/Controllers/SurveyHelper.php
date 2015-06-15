@@ -59,15 +59,16 @@ class SurveyHelper extends Controller{
 
                 case 'N':
                     return array(
-                        'message' => 'Survey is not Active, notify administrator',
+                        'message' => 'Este instrumento no esta activo, notifica a tu administrador',
                         'status' => false
                     );
             }
         }
 
         return array(
-            'message' => $surveyStatus['status'],
+            'message' => 'Este instrumento no existe, verifica tu token',
             'status' => false
         );
     }
+
 }

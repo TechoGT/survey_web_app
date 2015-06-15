@@ -41,14 +41,23 @@ class ResponseSyncController extends SurveyHelper {
         // Gettin the json input from the user, when sync is triggered
         $postData = Input::json()->all();
 
+        //First check if post data is valid
+        if(count($postData) == 0){
+            return array(
+                'status' => false,
+                'message' => 'Error en el JSON, revisar sintaxis'
+            );
+        }
+
         $responses = $postData['answers'];
-        $idSurvey = array_keys($responses)[0];
+        $idSurvey = $postData['sid'];
 
         // If survey is active send response
         $surveyStatus = $this->checkSurveyStatus($RPCClient,$sessionKey,$idSurvey);
 
         if($surveyStatus['status']){
-            $this->addResponse($RPCClient,$sessionKey,$idSurvey,$responses);
+
+            return $this->addResponse($RPCClient,$sessionKey,$idSurvey,$responses);
         }
         else{
             return $surveyStatus;
@@ -77,7 +86,7 @@ class ResponseSyncController extends SurveyHelper {
         $coreQuantityInserted = 0;
 
         foreach($responses as $response){
-            dd($response);
+
             $coreResponse = $RPCClient->add_response($sessionKey,$idSurvey,$response);
 
             if(is_numeric($coreResponse)){
@@ -87,14 +96,12 @@ class ResponseSyncController extends SurveyHelper {
             else{
                 $coreResponse['message'] = $coreResponse['status'];
                 $coreResponse['status'] = false;
-
-                return $coreResponse;
             }
         }
 
         return array(
             "status" => true,
-            "quantity" => $coreQuantityInserted
+            "inserted" => $coreQuantityInserted
         );
 
     }
