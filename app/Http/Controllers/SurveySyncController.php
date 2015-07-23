@@ -43,20 +43,19 @@ class SurveySyncController extends SurveyHelper {
 	 */
 	public function show($id)
 	{
-
-
         //Start a JSON RPC Client for the requests
         $RPCClient = new JsonRPCClient( LS_BASEURL.'admin/remotecontrol' );
 
         //User private Token
         $sessionKey =  $this->authUser($RPCClient);
 
-        // If survey is active send response
         $surveyStatus = $this->checkSurveyStatus($RPCClient,$sessionKey,$id);
 
+				// If survey is active send response
         if($surveyStatus['status']){
             return $this->syncSurvey($RPCClient,$sessionKey,$id);
         }
+				// If survey is inactive
         else{
             return $surveyStatus;
         }
@@ -136,7 +135,11 @@ class SurveySyncController extends SurveyHelper {
             'subquestions',	'attributes','attributes_lang','answeroptions'
         ));
         $qList['id'] = $id;
+				//Remove all html tags from limesurvey in 'question'
         $qList['question'] = strip_tags($qList['question']);
+				//Remove all html tags from limesurvey in 'help'
+				$qList['help'] = strip_tags($qList['help']);
+
 
         //Add of "checked" to any subquestion for ease of render in app
         // Only if the array has subquestions

@@ -1,12 +1,15 @@
-<?php namespace App\Http\Controllers\GroupOfQuestions;
+<?php namespace App\Http\Controllers;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 
-class GroupOfQuestionsController extends Controller {
+class UsersController extends Controller {
 
+	public function login(){
+		return view('auth.login');
+	}
 	/**
 	 * Display a listing of the resource.
 	 *
@@ -45,7 +48,7 @@ class GroupOfQuestionsController extends Controller {
 	 */
 	public function show($id)
 	{
-
+		//
 	}
 
 	/**

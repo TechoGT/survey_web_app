@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Techo Guatemala - Sistema de Censos</title>
+    <title>Techo Guatemala - Sistema de Censos de vivienda</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -52,10 +52,10 @@
                     <a href="#about">Equipo</a>
                 </li>
                 <li>
-                    <a href="#services">Servicios</a>
+                    <a href="#services">Contacto</a>
                 </li>
                 <li>
-                    <a href="#contact">Contacto</a>
+                    <a href="{{ url('/auth/login') }}">Entrar</a>
                 </li>
             </ul>
         </div>

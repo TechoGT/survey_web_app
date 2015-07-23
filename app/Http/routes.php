@@ -16,6 +16,8 @@ Route::get('/', 'WelcomeController@index');
 
 Route::get('home', 'HomeController@index');
 
+Route::get('login', 'UsersController@login');
+
 Route::group(array('prefix' => 'api/v1'), function()
 {
 
