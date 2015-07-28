@@ -88,6 +88,14 @@ class SurveySyncController extends SurveyHelper {
         }
 
         $suInfo = $this->getSurveyProperties($RPCClient,$sessionKey,$id);
+
+				// Before inserting, order by group_order
+				// First Extract groupOrder and then apply SORT
+				foreach($sections as $key =>$row){
+					$sectionsOrder[$key] = $row['group_order'];
+				}
+				array_multisort($sectionsOrder,SORT_ASC,$sections);
+
         $suInfo['sections'] = $sections;
 
         // release the session key
@@ -196,6 +204,12 @@ class SurveySyncController extends SurveyHelper {
                 $qWithProps [] = $this->getQuestionProperty($RPCClient,$sessionKey,$qId);
             }
         }
+				// Before returning, order by question_order
+				// First Extract questionOrder and then apply SORT
+				foreach($qWithProps as $key =>$row){
+					$questionOrder[$key] = $row['question_order'];
+				}
+				array_multisort($questionOrder,SORT_ASC,$qWithProps);
         return $qWithProps;
     }
 
