@@ -148,6 +148,14 @@ class SurveySyncController extends SurveyHelper {
 				//Remove all html tags from limesurvey in 'help'
 				$qList['help'] = strip_tags($qList['help']);
 
+				// Remove external parentheses in Conditional
+				preg_match('/(\()(.*)(\))/', $qList['relevance'], $match);
+				if($match){
+					$qList['relevance'] = $match[2];
+				}
+
+				// Remove the phrase .NAOK of every Conditional
+				$qList['relevance']= preg_replace('/(.NAOK)/','',$qList['relevance']);
 
         //Add of "checked" to any subquestion for ease of render in app
         // Only if the array has subquestions
@@ -155,11 +163,9 @@ class SurveySyncController extends SurveyHelper {
             $subQuestions = array();
             foreach($qList['subquestions'] as $subQuestion){
                 $subQuestion['checked'] = false;
-
                 //Add 'answer' empty field to store answer in phone
-                if(array_key_exists('scale_id',$subQuestion) && $subQuestion['scale_id'] == 1){
-                    $subQuestion['answer'] = "";
-                }
+								// Works with 'scale_id' 1 or 0
+                $subQuestion['answer'] = "";
 
                 //Search for a type in Question, using the ##type
                 $questionText = $subQuestion['question'];
@@ -227,6 +233,8 @@ class SurveySyncController extends SurveyHelper {
 
         ));
 
+				//Remove all html tags from limesurvey in 'description'
+				$qList['description'] = strip_tags($groupInfo['description']);
         return $groupInfo;
     }
 
