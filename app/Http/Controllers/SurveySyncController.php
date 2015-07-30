@@ -234,7 +234,7 @@ class SurveySyncController extends SurveyHelper {
         ));
 
 				//Remove all html tags from limesurvey in 'description'
-				$qList['description'] = strip_tags($groupInfo['description']);
+				$groupInfo['description'] = strip_tags($groupInfo['description']);
         return $groupInfo;
     }
 
