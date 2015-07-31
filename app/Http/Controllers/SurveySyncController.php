@@ -159,7 +159,7 @@ class SurveySyncController extends SurveyHelper {
 
         //Add of "checked" to any subquestion for ease of render in app
         // Only if the array has subquestions
-        if(count($qList['subquestions']) > 1){
+        if(count($qList['subquestions']) >= 1 & is_array($qList['subquestions'])){
             $subQuestions = array();
             foreach($qList['subquestions'] as $subQuestion){
                 $subQuestion['checked'] = false;
@@ -176,13 +176,40 @@ class SurveySyncController extends SurveyHelper {
                     //Remove specified ##type
                     $subQuestion['question'] = preg_replace('/(##)(.)/','',$questionText);
                 }
-
                 //Add modified question to question
                 $subQuestions[] = $subQuestion;
             }
-
             $qList['subquestions'] = $subQuestions;
         }
+
+				// If the answeroptions has a ##type converto to type
+				if(count($qList['answeroptions']) >= 1 & is_array($qList['answeroptions'])){
+            $answerOptions = array();
+            foreach($qList['answeroptions'] as $answerOption){
+                //Search for a type in Question, using the ##type
+                $answerText = $answerOption['answer'];
+                preg_match('/(##)(.)/', $answerText, $match);
+                if($match){
+                    //Set type found. second position is the character
+                    $answerOption['type'] = strtoupper($match[2]);
+                    //Remove specified ##type
+                    $answerOption['answer'] = preg_replace('/(##)(.)/','',$answerText);
+                }
+                //Add modified answer to subanswer
+                $qList['answerOptions'] = $answerOption;
+            }
+            $qList['answeroptions'] = $answerOptions;
+        }
+				$questionText = $qList['question'];
+				//Check if the question belogs to a Sub-section
+				preg_match('/##(.*)##QG(\d+)/', $questionText, $match);
+				if($match){
+					$qList['subSectionId'] = $match[2];
+					$qList['SubSectionName'] = $match[1];
+					//Remove the specification of the subSection
+					$qList['question'] = preg_replace('/(##.*##QG\d+)/','',$questionText);
+				}
+
         return $qList;
     }
 
