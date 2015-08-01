@@ -196,7 +196,7 @@ class SurveySyncController extends SurveyHelper {
                     $answerOption['answer'] = preg_replace('/(##)(.)/','',$answerText);
                 }
                 //Add modified answer to subanswer
-                $qList['answerOptions'] = $answerOption;
+                $qList[] = $answerOption;
             }
             $qList['answeroptions'] = $answerOptions;
         }
