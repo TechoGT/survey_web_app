@@ -159,9 +159,10 @@ class SurveySyncController extends SurveyHelper {
 
         //Add of "checked" to any subquestion for ease of render in app
         // Only if the array has subquestions
-        if(count($qList['subquestions']) >= 1 & is_array($qList['subquestions'])){
+
+        if(is_array($qList['subquestions'])){
             $subQuestions = array();
-            foreach($qList['subquestions'] as $subQuestion){
+            foreach($qList['subquestions'] as $key => $subQuestion){
                 $subQuestion['checked'] = false;
                 //Add 'answer' empty field to store answer in phone
 								// Works with 'scale_id' 1 or 0
@@ -177,15 +178,15 @@ class SurveySyncController extends SurveyHelper {
                     $subQuestion['question'] = preg_replace('/(##)(.)/','',$questionText);
                 }
                 //Add modified question to question
-                $subQuestions[] = $subQuestion;
+                $subQuestions[$key] = $subQuestion;
             }
             $qList['subquestions'] = $subQuestions;
         }
 
 				// If the answeroptions has a ##type converto to type
-				if(count($qList['answeroptions']) >= 1 & is_array($qList['answeroptions'])){
+				if(is_array($qList['answeroptions'])){
             $answerOptions = array();
-            foreach($qList['answeroptions'] as $answerOption){
+            foreach($qList['answeroptions'] as $key => $answerOption){
                 //Search for a type in Question, using the ##type
                 $answerText = $answerOption['answer'];
                 preg_match('/(##)(.)/', $answerText, $match);
@@ -196,7 +197,7 @@ class SurveySyncController extends SurveyHelper {
                     $answerOption['answer'] = preg_replace('/(##)(.)/','',$answerText);
                 }
                 //Add modified answer to subanswer
-                $answerOptions[] = $answerOption;
+                $answerOptions[$key] = $answerOption;
             }
             $qList['answeroptions'] = $answerOptions;
         }
