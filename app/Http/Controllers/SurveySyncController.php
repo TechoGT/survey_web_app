@@ -150,12 +150,26 @@ class SurveySyncController extends SurveyHelper {
 
 				// Remove external parentheses in Conditional
 				preg_match('/(\()(.*)(\))/', $qList['relevance'], $match);
+				//dd($match);
 				if($match){
 					$qList['relevance'] = $match[2];
 				}
 
 				// Remove the phrase .NAOK of every Conditional
 				$qList['relevance']= preg_replace('/(.NAOK)/','',$qList['relevance']);
+
+				// Remove is_empty and replace it with undefined
+				preg_match_all('/is_empty\((\w*)/',$qList['relevance'],$matches,PREG_SET_ORDER);
+				// Get only full identifires, that have is_empty
+				$matchCleared = array();
+				$patterns = array();
+				if($match){
+					foreach($matches as $match){
+						$matchCleared[] = '('.$match[1].' == \'undefined\')';
+						$patterns[] = '/is_empty\(\w*\)/';
+					}
+					$qList['relevance'] = preg_replace($patterns,$matchCleared,$qList['relevance']);
+				}
 
         //Add of "checked" to any subquestion for ease of render in app
         // Only if the array has subquestions
