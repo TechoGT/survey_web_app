@@ -158,6 +158,9 @@ class SurveySyncController extends SurveyHelper {
 				// Remove the phrase .NAOK of every Conditional
 				$qList['relevance']= preg_replace('/(.NAOK)/','',$qList['relevance']);
 
+				// Remove the phrase .NAOK of every Conditional
+				$qList['relevance']= preg_replace('/(!)/','not',$qList['relevance']);
+
 				// Remove is_empty and replace it with undefined
 				preg_match_all('/is_empty\((\w*)/',$qList['relevance'],$matches,PREG_SET_ORDER);
 				// Get only full identifires, that have is_empty
@@ -165,7 +168,7 @@ class SurveySyncController extends SurveyHelper {
 				$patterns = array();
 				if($match){
 					foreach($matches as $match){
-						$matchCleared[] = '('.$match[1].' == "undefined")';
+						$matchCleared[] = '('.$match[1].' == \'undefined\')';
 						$patterns[] = '/is_empty\(\w*\)/';
 					}
 					$qList['relevance'] = preg_replace($patterns,$matchCleared,$qList['relevance']);
