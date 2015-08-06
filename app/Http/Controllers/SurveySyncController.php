@@ -170,7 +170,7 @@ class SurveySyncController extends SurveyHelper {
 				$patterns = array();
 				if($match){
 					foreach($matches as $match){
-						$matchCleared[] = '('.$match[1].' == "undefined")';
+						$matchCleared[] = '('.$match[1].' == "-1")';
 						$patterns[] = '/is_empty\(\w*\)/';
 					}
 					$qList['relevance'] = preg_replace($patterns,$matchCleared,$qList['relevance']);
