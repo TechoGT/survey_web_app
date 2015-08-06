@@ -230,6 +230,14 @@ class SurveySyncController extends SurveyHelper {
 					$qList['question'] = preg_replace('/(##.*##QG\d+)/','',$questionText);
 				}
 
+				// EXCLUDE_ALL_OTHERS change ';' for space
+				if(is_array($qList['attributes'])){
+					if(array_key_exists('exclude_all_others',$qList['attributes'])){
+						$attribute = $qList['attributes']['exclude_all_others'];
+						$qList['attributes']['exclude_all_others'] = preg_replace('/;/',' ',$attribute);
+					}
+				}
+
         return $qList;
     }
 
