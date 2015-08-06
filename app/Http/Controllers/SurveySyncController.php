@@ -158,8 +158,10 @@ class SurveySyncController extends SurveyHelper {
 				// Remove the phrase .NAOK of every Conditional
 				$qList['relevance']= preg_replace('/(.NAOK)/','',$qList['relevance']);
 
-				// Remove the phrase .NAOK of every Conditional
-				$qList['relevance']= preg_replace('/(!\()/','not',$qList['relevance']);
+				// Change ! for not in  every Conditional
+				$qList['relevance']= preg_replace('/(!)/','not',$qList['relevance']);
+				// Fix, because /(!\()/ does not work
+				$qList['relevance']= preg_replace('/(not=)/','!=',$qList['relevance']);
 
 				// Remove is_empty and replace it with undefined
 				preg_match_all('/is_empty\((\w*)/',$qList['relevance'],$matches,PREG_SET_ORDER);
