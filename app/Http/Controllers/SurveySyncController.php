@@ -83,6 +83,12 @@ class SurveySyncController extends SurveyHelper {
 
             $groupInfo ['questions']= $qOfGroup;
 
+            //Verify if first seccion is for Volunteers group_name
+            $groupName = $groupInfo['group_name'];
+            preg_match('/(##volunteers)/', $groupName, $match);
+            if($match){
+                $groupInfo['type'] = 'volunteers';
+            }
             $sections[] = $groupInfo;
 
         }
