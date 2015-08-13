@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 
+use Carbon\Carbon;
 use \org\jsonrpcphp\JsonRPCClient;
 use Input;
 class ResponseSyncController extends SurveyHelper {
@@ -38,7 +39,7 @@ class ResponseSyncController extends SurveyHelper {
         //User private Token
         $sessionKey = $this->authUser($RPCClient);
 
-        // Gettin the json input from the user, when sync is triggered
+        // Getting the json input from the user, when sync is triggered
         $postData = Input::json()->all();
 
         //First check if post data is valid
@@ -86,7 +87,7 @@ class ResponseSyncController extends SurveyHelper {
         $coreQuantityInserted = 0;
 
         foreach($responses as $response){
-
+            $response['submitdate'] = Carbon::now();
             $coreResponse = $RPCClient->add_response($sessionKey,$idSurvey,$response);
 
             if(is_numeric($coreResponse)){
