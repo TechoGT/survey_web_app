@@ -87,7 +87,9 @@ class ResponseSyncController extends SurveyHelper {
         $coreQuantityInserted = 0;
 
         foreach($responses as $response){
-            $response['submitdate'] = Carbon::now();
+            $date = new \DateTime('now');
+            $response['submitdate'] = $date->format('Y-m-d H:i:s');
+            //dd($response);
             $coreResponse = $RPCClient->add_response($sessionKey,$idSurvey,$response);
 
             if(is_numeric($coreResponse)){
