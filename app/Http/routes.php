@@ -22,7 +22,8 @@ Route::group(array('prefix' => 'api/v1'), function()
 {
 
     // First Route
-    Route::resource('/sync/survey', 'SurveySyncController');
+    Route::resource('/construct/survey', 'SurveySyncController');
+    Route::resource('/sync/survey', 'SurveyCacheSyncController');
     // List groups
     Route::resource('/sync/response', 'ResponseSyncController');
 
