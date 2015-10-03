@@ -41,9 +41,13 @@ class SurveyCacheSyncController extends SurveyHelper {
 	 */
 	public function show($id)
 	{
-        $survey = file_get_contents('localhost:3000/api/construct/'.$id);
+        $survey = file_get_contents('http://localhost:3000/api/construct/'.$id);
 
         $decodif = json_decode($survey,true);
+
+        if(array_key_exists('status', $decodif){
+        	return $decodif;
+        }
 
         if($decodif === null){
 
@@ -52,7 +56,6 @@ class SurveyCacheSyncController extends SurveyHelper {
             return $coreResponse;
         }
         return $decodif['content'];
-
 	}
 
 }
