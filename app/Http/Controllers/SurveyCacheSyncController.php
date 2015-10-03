@@ -41,7 +41,7 @@ class SurveyCacheSyncController extends SurveyHelper {
 	 */
 	public function show($id)
 	{
-        $survey = file_get_contents('http://104.236.127.205:3000/api/construct/'.$id);
+        $survey = file_get_contents('localhost:3000/api/construct/'.$id);
 
         $decodif = json_decode($survey,true);
 
