@@ -45,7 +45,7 @@ class SurveyCacheSyncController extends SurveyHelper {
 
         $decodif = json_decode($survey,true);
 
-        if(array_key_exists('status', $decodif){
+        if(array_key_exists('status', $decodif)){
         	return $decodif;
         }
 

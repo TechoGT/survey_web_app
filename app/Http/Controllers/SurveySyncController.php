@@ -130,6 +130,9 @@ class SurveySyncController extends SurveyHelper {
             'surveyls_title','surveyls_description','surveyls_welcometext',
             'surveyls_endtext'
         ),'es');
+				$moreSurveyProp['surveyls_description'] = strip_tags($moreSurveyProp['surveyls_description']);
+				$moreSurveyProp['surveyls_welcometext'] = strip_tags($moreSurveyProp['surveyls_welcometext']);
+				$moreSurveyProp['surveyls_endtext'] = strip_tags($moreSurveyProp['surveyls_endtext']);
         // Insert extra data to array
         $united = array_merge($moreSurveyProp,$surveyProp);
         return $united;
